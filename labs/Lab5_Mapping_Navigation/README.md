@@ -170,7 +170,25 @@ ros2 topic hz /scan     # note the scan rate
 ros2 topic echo /scan --once --field ranges | tr ',' '\n' | wc -l
 ```
 
-Gmapping requires fewer than 1440 points per scan.
+Gmapping requires fewer than 1440 points per scan. `./check_lab5.sh robot` does all of these checks in one go.
+
+### 4.4 Helper scripts
+
+Two scripts in this folder save typing. Both find the workspaces themselves and default to `ROS_DOMAIN_ID=21`.
+
+| Command | What it runs |
+|---|---|
+| `./run_lab5.sh agent [udp\|serial]` | micro-ROS agent, UDP 8090 or serial `/dev/ttyUSB0` at 921600 |
+| `./run_lab5.sh bringup` | `yahboomcar_bringup_launch.py` |
+| `./run_lab5.sh rviz` | `display_launch.py` |
+| `./run_lab5.sh gmapping` / `cartographer` | `map_gmapping_launch.py` / `map_cartographer_launch.py` |
+| `./run_lab5.sh teleop [keyboard\|joy]` | `yahboom_keyboard`, or `joy_node` + `yahboom_joy` |
+| `./run_lab5.sh save <name>` | `save_map_launch.py map_path:=.../maps/<name>` |
+| `./run_lab5.sh relay` | `topic_tools relay /odometry/filtered /odom` |
+| `./run_lab5.sh nav <name> [params.yaml]` | `navigation_dwb_launch.py maps:=... [params_file:=...]` |
+| `./run_lab5.sh stop` | one zero `/cmd_vel` |
+| `./run_lab5.sh tf` / `graph` | `view_frames` / `rqt_graph` |
+| `./check_lab5.sh robot\|bringup\|slam\|nav` | PASS / WARN / FAIL report for that stage and the stages before it |
 
 ---
 
@@ -181,6 +199,11 @@ Open four terminals. Keep the agent from Part 0 running.
 ```bash
 # T2 — low-level data processing (IMU filter, EKF, URDF, TF)
 ros2 launch yahboomcar_bringup yahboomcar_bringup_launch.py
+
+# T6 — check bringup; if it warns that only /odometry/filtered exists,
+#      run `./run_lab5.sh relay` in its own terminal and keep it open for the whole lab
+#      (Cartographer and Nav2 both read /odom)
+./check_lab5.sh bringup
 
 # T3 — RViz (map will be empty until SLAM runs)
 ros2 launch yahboomcar_nav display_launch.py
@@ -293,7 +316,7 @@ Stop SLAM (T4) and teleop (T5). Keep the agent, bringup and RViz running. Place 
 
 ### 3.0 Pre-flight check: odometry topic
 
-`dwb_nav_params.yaml` expects odometry on `/odom` (`bt_navigator.odom_topic`, `velocity_smoother.odom_topic`). Check what bringup publishes:
+`dwb_nav_params.yaml` expects odometry on `/odom` (`bt_navigator.odom_topic`, `velocity_smoother.odom_topic`). If you already started the relay in Part 1, keep it running. Otherwise check what bringup publishes:
 
 ```bash
 ros2 topic list | grep -E "odom"
@@ -454,6 +477,8 @@ For each experiment note the time to the goal, the final error, the path shape, 
 | Parameter study | 15 |
 | Questions | 10 |
 | **Total** | **100** |
+
+The report template is `report_template.md` in this folder.
 
 ### Files to leave in the repository (team branch)
 
