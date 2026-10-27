@@ -29,10 +29,13 @@ def generate_launch_description():
     )
     
 
-    ekf_node = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([os.path.join(
-            get_package_share_directory('robot_localization'), 'launch'),
-            '/ekf.launch.py'])
+    ekf_node = Node(
+        package='robot_localization',
+        executable='ekf_node',
+        name='ekf_filter_node',
+        output='screen',
+        parameters=[os.path.join(
+            get_package_share_directory('yahboomcar_bringup'), 'param', 'ekf_yahboom.yaml')]
     )
     
     
