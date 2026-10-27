@@ -42,7 +42,7 @@ def generate_launch_description():
             parameters=[{'use_sim_time': use_sim_time}],
             arguments=['-configuration_directory', configuration_directory,
                        '-configuration_basename', configuration_basename],
-            remappings=[('/odom','/odom')]
+            remappings=[('/odom','/odometry/filtered')]
                        ),
 
         DeclareLaunchArgument(
